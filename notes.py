@@ -17,6 +17,8 @@ def main(args):
     try:
         # Check if folder exists or create one
         PATH = "./notes/"
+        CONFIRM = ("y", "yes", "si", "s")
+
         try:
             os.mkdir(PATH)
             print('Folder "/notes" created')
@@ -33,7 +35,7 @@ def main(args):
             if name in get_filename_list(PATH):
                 answer = input( f'Name "{name}" already exists, want to overwrite it? "y" | "n" ').lower()
 
-                if answer is not None and answer in ("y", "yes", "si", "s"):
+                if answer is not None and answer in CONFIRM:
                     mode = 'w'
 
             with open(filename, mode) as note:
@@ -48,7 +50,7 @@ def main(args):
             if name not in get_filename_list(PATH):
                 answer = input( f'File "{name}" not exists, want to create it? "y" | "n" ').lower()
                 print(answer)
-                if answer is not None and answer not in ("y", "yes", "si", "s"):
+                if answer is not None and answer not in CONFIRM:
                     print('Exited program')
                     return 0
 
@@ -63,7 +65,18 @@ def main(args):
                 with open(filename, "r") as note:
                     print(note.readlines())
             else:
-                print("File not found, use 'python -m notes -l' to check the list of notes")
+                print(file_not_found_msg())
+        # delete
+        elif name := args.delete:
+
+            if name in get_filename_list(PATH):
+                filename = f"{PATH}{name}.txt"
+                answer = input(f'Are you sure to delete {name}? File can\'t be restored after deletion. "y" | "n" > ')
+                if answer is not None and answer in CONFIRM:
+                    os.remove(filename)
+                    print(f'{filename} deleted from the notes.')
+            else:
+                print(file_not_found_msg())
 
         # notes list
         elif args.list:
@@ -80,12 +93,16 @@ def main(args):
             return 1
 
 
-def get_filename_list(path):
+def get_filename_list(path: str) -> list[str]:
 
     files = glob.glob(path + "*")
     names = [f.split("\\")[1][:-4] for f in files]
 
-    return names if names else ["empty folder!"]
+    return names if names else ["Empty folder!"]
+
+
+def file_not_found_msg() -> str:
+    return "File not found, use 'python -m notes -l' to check the list of notes"
 
 
 def cli():
@@ -110,7 +127,7 @@ def cli():
         help="take in input the filename, if it exists open it in edit mode, if not asks if you want to create a new one",
     )
     parser.add_argument(
-        "-d", "--del", action="store", help="given a filename, deletes it."
+        "-d", "--delete", action="store", help="given a filename, deletes it."
     ),
     parser.add_argument(
         "-l",
