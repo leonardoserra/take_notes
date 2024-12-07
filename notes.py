@@ -16,11 +16,12 @@ def main(args):
     # if some error exit code is 1
     try:
         # Check if folder exists or create one
-        PATH = "./notes/"
+        NOTES_DIR = "./notes/"
         CONFIRM = ("y", "yes", "si", "s")
         NOT_FOUND_MSG = "File not found, use 'python -m notes -l' to check the list of notes"
+
         try:
-            os.mkdir(PATH)
+            os.mkdir(NOTES_DIR)
             print('Folder "/notes" created')
 
         except FileExistsError as e:
@@ -29,59 +30,63 @@ def main(args):
         # new file.
         if name := args.new:
 
-            filename = f"{PATH}{name}.txt"
+            file_path = f"{NOTES_DIR}{name}.txt"
             mode = 'a'
 
-            if name in get_filename_list(PATH):
+            if name in get_filename_list(NOTES_DIR):
                 answer = input( f'Name "{name}" already exists, want to overwrite it? "y" | "n" ').lower()
 
                 if answer is not None and answer in CONFIRM:
                     mode = 'w'
 
-            with open(filename, mode) as note:
-                note.writelines(input("Write your text: \n> "))
+            create_note(file_path, mode)
 
         # edit file.
         elif name := args.edit:
 
-            filename = f"{PATH}{name}.txt"
-            mode = 'a'
+            file_path = f"{NOTES_DIR}{name}.txt"
 
-            if name not in get_filename_list(PATH):
+            if name not in get_filename_list(NOTES_DIR):
                 answer = input( f'File "{name}" not exists, want to create it? "y" | "n" ').lower()
                 print(answer)
+
                 if answer is not None and answer not in CONFIRM:
                     print('Exited program')
                     return 0
+            else:
+                read_note(file_path)
 
-            with open(filename, mode) as note:
-                note.writelines(input("Write your text: \n> "))
+            edit_note(file_path)
 
         # read
         elif name := args.read:
 
-            if name in get_filename_list(PATH):
-                filename = f"{PATH}{name}.txt"
-                with open(filename, "r") as note:
+            if name in get_filename_list(NOTES_DIR):
+                file_path = f"{NOTES_DIR}{name}.txt"
+                with open(file_path, "r") as note:
                     print(note.readlines())
+
             else:
                 print(NOT_FOUND_MSG)
+
         # delete
         elif name := args.delete:
 
-            if name in get_filename_list(PATH):
-                filename = f"{PATH}{name}.txt"
+            if name in get_filename_list(NOTES_DIR):
+                file_path = f"{NOTES_DIR}{name}.txt"
                 answer = input(f'Are you sure to delete {name}? File can\'t be restored after deletion. "y" | "n" > ')
+
                 if answer is not None and answer in CONFIRM:
-                    os.remove(filename)
-                    print(f'{filename} deleted from the notes.')
+                    os.remove(file_path)
+                    print(f'{file_path} deleted from the notes.')
+
             else:
                 print(NOT_FOUND_MSG)
 
         # notes list
         elif args.list:
 
-            l_names = get_filename_list(PATH)
+            l_names = get_filename_list(NOTES_DIR)
             names = "- " + "\n- ".join(l_names)
 
             print(names)
@@ -91,6 +96,26 @@ def main(args):
     except BaseException as e:
             print(e)
             return 1
+
+
+def create_note(file_path: str, mode='w'):
+    with open(file_path, mode) as note:
+        note.writelines(input("Write your text: \n> "))
+
+
+def edit_note(file_path: str):
+    with open(file_path, 'a') as note:
+        note.writelines(input("Write your text: \n> "))
+
+
+def read_note(file_path: str):
+    with open(file_path, "r") as note:
+        print(note.readlines())
+
+
+def delete_note(file_path: str):
+    os.remove(file_path)
+    print(f'{file_path} deleted from the notes.')
 
 
 def get_filename_list(path: str) -> list[str]:
