@@ -16,6 +16,7 @@ def main(args: argparse.Namespace):
 
     # if some error exit code is 1 exit_program_dirty(e)
     try:
+
         # Check if folder exists or create one
         NOTES_DIR = "./notes/"
         CONFIRM = ("y", "yes", "si", "s")
@@ -24,21 +25,31 @@ def main(args: argparse.Namespace):
         )
 
         try:
+
             os.mkdir(NOTES_DIR)
             print('Folder "/notes" created')
 
         except FileExistsError as e:
+
             pass
+
+        file_extension = "txt"
+
+        if args.type:
+            file_extension = args.type
 
         # new file.
         if name := args.new:
 
-            file_path = f"{NOTES_DIR}{name}.txt"
+            filename = f"{name}.{file_extension}"
+            file_path = f"{NOTES_DIR}{name}.{file_extension}"
+
             mode = "a"
 
-            if name in get_filename_list(NOTES_DIR):
+            if filename in get_filename_list(NOTES_DIR):
+
                 answer = input(
-                    f'Name "{name}" already exists, want to overwrite it? "y" | "n" '
+                    f'Name "{filename}" already exists, want to overwrite it? "y" | "n" '
                 ).lower()
 
                 if answer is not None and answer in CONFIRM:
@@ -46,7 +57,7 @@ def main(args: argparse.Namespace):
 
                 else:
                     answer = input(
-                        f'Do you want to edit note "{name}"? "y" | "n" '
+                        f'Do you want to edit note "{filename}"? "y" | "n" '
                     ).lower()
 
                     if answer is not None and answer in CONFIRM:
@@ -67,16 +78,19 @@ def main(args: argparse.Namespace):
         # edit file.
         elif name := args.edit:
 
-            file_path = f"{NOTES_DIR}{name}.txt"
+            filename = f"{name}.{file_extension}"
+            file_path = f"{NOTES_DIR}{filename}"
 
-            if name not in get_filename_list(NOTES_DIR):
+            if filename not in get_filename_list(NOTES_DIR):
+
                 answer = input(
-                    f'File "{name}" not exists, want to create it? "y" | "n" '
+                    f'File "{filename}" not exists, want to create it? "y" | "n" '
                 ).lower()
 
                 print(answer)
 
                 if answer is not None and answer not in CONFIRM:
+
                     return exit_program_clean()
 
             read_note(file_path)
@@ -87,26 +101,35 @@ def main(args: argparse.Namespace):
         # read
         elif name := args.read:
 
-            if name in get_filename_list(NOTES_DIR):
-                file_path = f"{NOTES_DIR}{name}.txt"
+            filename = f"{name}.{file_extension}"
+
+            if filename in get_filename_list(NOTES_DIR):
+
+                file_path = f"{NOTES_DIR}{filename}"
                 read_note(file_path)
 
             else:
+
                 print(NOT_FOUND_MSG)
 
         # delete
         elif name := args.delete:
 
-            if name in get_filename_list(NOTES_DIR):
-                file_path = f"{NOTES_DIR}{name}.txt"
+            filename = f"{name}.{file_extension}"
+
+            if filename in get_filename_list(NOTES_DIR):
+
+                file_path = f"{NOTES_DIR}{filename}"
                 answer = input(
-                    f'Are you sure to delete {name}? File can\'t be restored after deletion. "y" | "n" > '
+                    f'Are you sure to delete {filename}? File can\'t be restored after deletion. "y" | "n" > '
                 )
 
                 if answer is not None and answer in CONFIRM:
+
                     delete_note(file_path)
 
             else:
+
                 print(NOT_FOUND_MSG)
 
         # delete folder and all notes
@@ -117,9 +140,11 @@ def main(args: argparse.Namespace):
             )
 
             if answer is not None and answer in CONFIRM:
+
                 delete_folder(NOTES_DIR)
 
             if not get_filename_list(NOTES_DIR):
+
                 print("All files has been deleted!")
 
         # notes list
@@ -133,6 +158,7 @@ def main(args: argparse.Namespace):
         return exit_program_clean()
 
     except BaseException as e:
+
         print(e)
 
         return exit_program_dirty(e)
@@ -183,10 +209,10 @@ def exit_program_dirty(error: BaseException) -> int:
     return 1
 
 
-def get_filename_list(path: str) -> list[str]:
+def get_filename_list(directory_path: str) -> list[str]:
 
-    files = glob.glob(path + "*")
-    names = [f.split("\\")[1][:-4] for f in files]
+    files = glob.glob(directory_path + "*")
+    names = [f.split("\\")[1] for f in files]
 
     return names if names else ["Empty folder!"]
 
@@ -230,6 +256,12 @@ def cli() -> argparse.Namespace:
         "--list",
         action="store_true",
         help="gives the list of all the notes in the folder.",
+    )
+    parser.add_argument(
+        "-t",
+        "--type",
+        action="store",
+        help="Choose the extension of the file.",
     )
 
     args = parser.parse_args()
