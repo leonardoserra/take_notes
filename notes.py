@@ -33,8 +33,24 @@ def main(args):
             if name in get_filename_list(PATH):
                 answer = input( f'Name "{name}" already exists, want to overwrite it? "y" | "n" ').lower()
 
-                if answer and answer in ("y", "yes", "si", "s"):
+                if answer is not None and answer in ("y", "yes", "si", "s"):
                     mode = 'w'
+
+            with open(filename, mode) as note:
+                note.writelines(input("Write your text: \n> "))
+
+        # edit file.
+        elif name := args.edit:
+
+            filename = f"{PATH}{name}.txt"
+            mode = 'a'
+
+            if name not in get_filename_list(PATH):
+                answer = input( f'File "{name}" not exists, want to create it? "y" | "n" ').lower()
+                print(answer)
+                if answer is not None and answer not in ("y", "yes", "si", "s"):
+                    print('Exited program')
+                    return 0
 
             with open(filename, mode) as note:
                 note.writelines(input("Write your text: \n> "))
