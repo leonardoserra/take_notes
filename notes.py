@@ -12,7 +12,7 @@ import shutil
 import argparse
 
 
-def main(args):
+def main(args: argparse.Namespace):
 
     # if some error exit code is 1 exit_program_dirty(e)
     try:
@@ -90,6 +90,7 @@ def main(args):
             if name in get_filename_list(NOTES_DIR):
                 file_path = f"{NOTES_DIR}{name}.txt"
                 read_note(file_path)
+
             else:
                 print(NOT_FOUND_MSG)
 
@@ -108,6 +109,19 @@ def main(args):
             else:
                 print(NOT_FOUND_MSG)
 
+        # delete folder and all notes
+        elif args.delete_all:
+
+            answer = input(
+                f'Are you sure to delete EVERY file? Files can\'t be restored after deletion. "y" | "n" > '
+            )
+
+            if answer is not None and answer in CONFIRM:
+                delete_folder(NOTES_DIR)
+
+            if not get_filename_list(NOTES_DIR):
+                print("All files has been deleted!")
+
         # notes list
         elif args.list:
 
@@ -116,56 +130,55 @@ def main(args):
 
             print(names)
 
-        elif args.delete_all:
-            answer = input(
-                f'Are you sure to delete EVERY file? Files can\'t be restored after deletion. "y" | "n" > '
-            )
-            if answer is not None and answer in CONFIRM:
-                delete_folder(NOTES_DIR)
-
-            if not get_filename_list(NOTES_DIR):
-                print("All files has been deleted!")
-
         return exit_program_clean()
 
     except BaseException as e:
         print(e)
+
         return exit_program_dirty(e)
 
 
-def create_note(file_path: str, mode="w"):
+def create_note(file_path: str, mode: str = "w") -> None:
+
     with open(file_path, mode) as note:
         note.writelines(input("Write your text: \n> "))
         note.write("\n")
 
 
-def edit_note(file_path: str):
+def edit_note(file_path: str) -> None:
+
     with open(file_path, "a") as note:
         note.writelines(input("Write your text: \n> "))
         note.write("\n")
 
 
-def read_note(file_path: str):
+def read_note(file_path: str) -> None:
+
     with open(file_path, "r") as note:
+        print("\n")
         lines = note.readlines()
         print("".join(lines))
 
 
-def delete_note(file_path: str):
+def delete_note(file_path: str) -> None:
+
     os.remove(file_path)
     print(f"{file_path} deleted from the notes.")
 
 
-def delete_folder(dir_path):
+def delete_folder(dir_path: str) -> None:
+
     shutil.rmtree(dir_path)
 
 
 def exit_program_clean() -> int:
+
     print("Program exited.")
     return 0
 
 
-def exit_program_dirty(error) -> int:
+def exit_program_dirty(error: BaseException) -> int:
+
     print(f"Program exited with errors. {error}")
     return 1
 
@@ -178,7 +191,8 @@ def get_filename_list(path: str) -> list[str]:
     return names if names else ["Empty folder!"]
 
 
-def cli():
+def cli() -> argparse.Namespace:
+
     parser = argparse.ArgumentParser("notes")
 
     parser.add_argument(
@@ -224,6 +238,7 @@ def cli():
 
 
 if __name__ == "__main__":
+
     args = cli()
     code = main(args)
     sys.exit(code)
