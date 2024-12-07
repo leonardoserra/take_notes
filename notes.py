@@ -13,47 +13,55 @@ import argparse
 
 def main(args):
 
-    # Check if folder exists or create one
-    PATH = "./notes/"
+    # if some error exit code is 1
     try:
-        os.mkdir(PATH)
-        print('Cartella "/notes" creata')
+        # Check if folder exists or create one
+        PATH = "./notes/"
+        try:
+            os.mkdir(PATH)
+            print('Folder "/notes" created')
 
-    except FileExistsError as e:
-        pass
+        except FileExistsError as e:
+            pass
 
-    # new file.
-    if name := args.new:
+        # new file.
+        if name := args.new:
 
-        filename = f"{PATH}{name}.txt"
-        mode = 'a'
-        
-        if name in get_filename_list(PATH):
-            answer = input( f'Il file {name} esiste gia, vuoi sovrascriverlo? "y" | "n" ').lower()
-
-            if answer and answer in ("y", "yes", "si", "s"):
-                mode = 'w'
-
-        with open(filename, mode) as note:
-            note.writelines(input("Scrivi: \n"))
-
-    # read
-    elif name := args.read:
-        if name in get_filename_list(PATH):
             filename = f"{PATH}{name}.txt"
-            with open(filename, "r") as note:
-                print(note.readlines())
-        else:
-            print("File non esistente, usa -l o --list per vedere la lista di note")
+            mode = 'a'
 
-    # notes list
-    elif args.list:
-        l_names = get_filename_list(PATH)
-        names = "- " + "\n- ".join(l_names)
+            if name in get_filename_list(PATH):
+                answer = input( f'Name "{name}" already exists, want to overwrite it? "y" | "n" ').lower()
 
-        print(names)
+                if answer and answer in ("y", "yes", "si", "s"):
+                    mode = 'w'
 
-    return 0
+            with open(filename, mode) as note:
+                note.writelines(input("Write your text: \n> "))
+
+        # read
+        elif name := args.read:
+
+            if name in get_filename_list(PATH):
+                filename = f"{PATH}{name}.txt"
+                with open(filename, "r") as note:
+                    print(note.readlines())
+            else:
+                print("File not found, use 'python -m notes -l' to check the list of notes")
+
+        # notes list
+        elif args.list:
+
+            l_names = get_filename_list(PATH)
+            names = "- " + "\n- ".join(l_names)
+
+            print(names)
+
+        return 0
+
+    except BaseException as e:
+            print(e)
+            return 1
 
 
 def get_filename_list(path):
@@ -61,7 +69,7 @@ def get_filename_list(path):
     files = glob.glob(path + "*")
     names = [f.split("\\")[1][:-4] for f in files]
 
-    return names if names else ["nessun file presente nella cartella"]
+    return names if names else ["empty folder!"]
 
 
 def cli():
