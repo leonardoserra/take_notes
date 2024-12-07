@@ -18,7 +18,9 @@ def main(args):
         # Check if folder exists or create one
         NOTES_DIR = "./notes/"
         CONFIRM = ("y", "yes", "si", "s")
-        NOT_FOUND_MSG = "File not found, use 'python -m notes -l' to check the list of notes"
+        NOT_FOUND_MSG = (
+            "File not found, use 'python -m notes -l' to check the list of notes"
+        )
 
         try:
             os.mkdir(NOTES_DIR)
@@ -31,13 +33,15 @@ def main(args):
         if name := args.new:
 
             file_path = f"{NOTES_DIR}{name}.txt"
-            mode = 'a'
+            mode = "a"
 
             if name in get_filename_list(NOTES_DIR):
-                answer = input( f'Name "{name}" already exists, want to overwrite it? "y" | "n" ').lower()
+                answer = input(
+                    f'Name "{name}" already exists, want to overwrite it? "y" | "n" '
+                ).lower()
 
                 if answer is not None and answer in CONFIRM:
-                    mode = 'w'
+                    mode = "w"
 
             create_note(file_path, mode)
 
@@ -47,11 +51,13 @@ def main(args):
             file_path = f"{NOTES_DIR}{name}.txt"
 
             if name not in get_filename_list(NOTES_DIR):
-                answer = input( f'File "{name}" not exists, want to create it? "y" | "n" ').lower()
+                answer = input(
+                    f'File "{name}" not exists, want to create it? "y" | "n" '
+                ).lower()
                 print(answer)
 
                 if answer is not None and answer not in CONFIRM:
-                    print('Exited program')
+                    print("Exited program")
                     return 0
             else:
                 read_note(file_path)
@@ -74,11 +80,13 @@ def main(args):
 
             if name in get_filename_list(NOTES_DIR):
                 file_path = f"{NOTES_DIR}{name}.txt"
-                answer = input(f'Are you sure to delete {name}? File can\'t be restored after deletion. "y" | "n" > ')
+                answer = input(
+                    f'Are you sure to delete {name}? File can\'t be restored after deletion. "y" | "n" > '
+                )
 
                 if answer is not None and answer in CONFIRM:
                     os.remove(file_path)
-                    print(f'{file_path} deleted from the notes.')
+                    print(f"{file_path} deleted from the notes.")
 
             else:
                 print(NOT_FOUND_MSG)
@@ -94,17 +102,17 @@ def main(args):
         return 0
 
     except BaseException as e:
-            print(e)
-            return 1
+        print(e)
+        return 1
 
 
-def create_note(file_path: str, mode='w'):
+def create_note(file_path: str, mode="w"):
     with open(file_path, mode) as note:
         note.writelines(input("Write your text: \n> "))
 
 
 def edit_note(file_path: str):
-    with open(file_path, 'a') as note:
+    with open(file_path, "a") as note:
         note.writelines(input("Write your text: \n> "))
 
 
@@ -115,7 +123,7 @@ def read_note(file_path: str):
 
 def delete_note(file_path: str):
     os.remove(file_path)
-    print(f'{file_path} deleted from the notes.')
+    print(f"{file_path} deleted from the notes.")
 
 
 def get_filename_list(path: str) -> list[str]:
