@@ -8,6 +8,7 @@
 import os
 import sys
 import glob
+import shutil
 import argparse
 
 
@@ -49,13 +50,19 @@ def main(args):
                     ).lower()
 
                     if answer is not None and answer in CONFIRM:
+                        read_note(file_path)
                         edit_note(file_path)
+                        print("Note Edited: \n")
+                        read_note(file_path)
+
                         return exit_program_clean()
 
                     else:
                         return exit_program_clean()
 
             create_note(file_path, mode)
+            print("Note Saved: \n")
+            read_note(file_path)
 
         # edit file.
         elif name := args.edit:
@@ -66,24 +73,24 @@ def main(args):
                 answer = input(
                     f'File "{name}" not exists, want to create it? "y" | "n" '
                 ).lower()
+
                 print(answer)
 
                 if answer is not None and answer not in CONFIRM:
-
                     return exit_program_clean()
-            else:
-                read_note(file_path)
 
+            
+            read_note(file_path)
             edit_note(file_path)
+            print("Note Edited: \n")
+            read_note(file_path)
 
         # read
         elif name := args.read:
 
             if name in get_filename_list(NOTES_DIR):
                 file_path = f"{NOTES_DIR}{name}.txt"
-                with open(file_path, "r") as note:
-                    print(note.readlines())
-
+                read_note(file_path)
             else:
                 print(NOT_FOUND_MSG)
 
@@ -97,8 +104,7 @@ def main(args):
                 )
 
                 if answer is not None and answer in CONFIRM:
-                    os.remove(file_path)
-                    print(f"{file_path} deleted from the notes.")
+                   delete_note(file_path)
 
             else:
                 print(NOT_FOUND_MSG)
@@ -110,8 +116,18 @@ def main(args):
             names = "- " + "\n- ".join(l_names)
 
             print(names)
+        
+        elif args.delete_all:
+            answer = input(
+                f'Are you sure to delete EVERY file? Files can\'t be restored after deletion. "y" | "n" > '
+            )
+            if answer is not None and answer in CONFIRM:
+               delete_folder(NOTES_DIR)
+            
+            if not get_filename_list(NOTES_DIR):
+                print("All files has been deleted!")
 
-        return 0
+        return exit_program_clean()
 
     except BaseException as e:
         print(e)
@@ -121,21 +137,28 @@ def main(args):
 def create_note(file_path: str, mode="w"):
     with open(file_path, mode) as note:
         note.writelines(input("Write your text: \n> "))
+        note.write("\n")
 
 
 def edit_note(file_path: str):
     with open(file_path, "a") as note:
         note.writelines(input("Write your text: \n> "))
+        note.write("\n")
 
 
 def read_note(file_path: str):
     with open(file_path, "r") as note:
-        print(note.readlines())
+        lines = note.readlines()
+        print(''.join(lines)) 
 
 
 def delete_note(file_path: str):
     os.remove(file_path)
     print(f"{file_path} deleted from the notes.")
+
+
+def delete_folder(dir_path):
+    shutil.rmtree(dir_path)
 
 
 def exit_program_clean() -> int:
@@ -178,7 +201,16 @@ def cli():
         help="take in input the filename, if it exists open it in edit mode, if not asks if you want to create a new one",
     )
     parser.add_argument(
+        "-rn",
+        "--rename",
+        action="store",
+        help="take in input the filename, if it exists open it in edit mode, if not asks if you want to create a new one",
+    )
+    parser.add_argument(
         "-d", "--delete", action="store", help="given a filename, deletes it."
+    ),
+    parser.add_argument(
+        "-da", "--delete_all", action="store_true", help="deletes all the notes."
     ),
     parser.add_argument(
         "-l",
