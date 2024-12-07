@@ -18,7 +18,7 @@ def main(args):
         # Check if folder exists or create one
         PATH = "./notes/"
         CONFIRM = ("y", "yes", "si", "s")
-
+        NOT_FOUND_MSG = "File not found, use 'python -m notes -l' to check the list of notes"
         try:
             os.mkdir(PATH)
             print('Folder "/notes" created')
@@ -65,7 +65,7 @@ def main(args):
                 with open(filename, "r") as note:
                     print(note.readlines())
             else:
-                print(file_not_found_msg())
+                print(NOT_FOUND_MSG)
         # delete
         elif name := args.delete:
 
@@ -76,7 +76,7 @@ def main(args):
                     os.remove(filename)
                     print(f'{filename} deleted from the notes.')
             else:
-                print(file_not_found_msg())
+                print(NOT_FOUND_MSG)
 
         # notes list
         elif args.list:
@@ -99,10 +99,6 @@ def get_filename_list(path: str) -> list[str]:
     names = [f.split("\\")[1][:-4] for f in files]
 
     return names if names else ["Empty folder!"]
-
-
-def file_not_found_msg() -> str:
-    return "File not found, use 'python -m notes -l' to check the list of notes"
 
 
 def cli():
