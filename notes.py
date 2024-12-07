@@ -13,7 +13,7 @@ import argparse
 
 def main(args):
 
-    # if some error exit code is 1
+    # if some error exit code is 1 exit_program_dirty(e)
     try:
         # Check if folder exists or create one
         NOTES_DIR = "./notes/"
@@ -43,6 +43,18 @@ def main(args):
                 if answer is not None and answer in CONFIRM:
                     mode = "w"
 
+                else:
+                    answer = input(
+                        f'Do you want to edit note "{name}"? "y" | "n" '
+                    ).lower()
+
+                    if answer is not None and answer in CONFIRM:
+                        edit_note(file_path)
+                        return exit_program_clean()
+
+                    else:
+                        return exit_program_clean()
+
             create_note(file_path, mode)
 
         # edit file.
@@ -57,8 +69,8 @@ def main(args):
                 print(answer)
 
                 if answer is not None and answer not in CONFIRM:
-                    print("Exited program")
-                    return 0
+
+                    return exit_program_clean()
             else:
                 read_note(file_path)
 
@@ -103,7 +115,7 @@ def main(args):
 
     except BaseException as e:
         print(e)
-        return 1
+        return exit_program_dirty(e)
 
 
 def create_note(file_path: str, mode="w"):
@@ -124,6 +136,16 @@ def read_note(file_path: str):
 def delete_note(file_path: str):
     os.remove(file_path)
     print(f"{file_path} deleted from the notes.")
+
+
+def exit_program_clean() -> int:
+    print("Program exited.")
+    return 0
+
+
+def exit_program_dirty(error) -> int:
+    print(f"Program exited with errors. {error}")
+    return 1
 
 
 def get_filename_list(path: str) -> list[str]:
