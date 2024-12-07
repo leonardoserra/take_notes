@@ -1,8 +1,8 @@
 """
-    Questo modulo serve a creare o modificare o eliminare dei file txt,
-    salva i file nella cartella './notes'
-    è praticamente un block notes. Però volevo farlo 
-    in python dato che è un sabato e sono a casa
+    This module is used to create or modify or delete txt files.
+    Save the files in the './notes' folder.
+    It's basically a notepad. But I wanted to do it 
+    in python since it's a Saturday and I'm at home, a little exercise never hurts.
 """
 
 import os
@@ -79,7 +79,6 @@ def main(args):
                 if answer is not None and answer not in CONFIRM:
                     return exit_program_clean()
 
-            
             read_note(file_path)
             edit_note(file_path)
             print("Note Edited: \n")
@@ -104,7 +103,7 @@ def main(args):
                 )
 
                 if answer is not None and answer in CONFIRM:
-                   delete_note(file_path)
+                    delete_note(file_path)
 
             else:
                 print(NOT_FOUND_MSG)
@@ -116,14 +115,14 @@ def main(args):
             names = "- " + "\n- ".join(l_names)
 
             print(names)
-        
+
         elif args.delete_all:
             answer = input(
                 f'Are you sure to delete EVERY file? Files can\'t be restored after deletion. "y" | "n" > '
             )
             if answer is not None and answer in CONFIRM:
-               delete_folder(NOTES_DIR)
-            
+                delete_folder(NOTES_DIR)
+
             if not get_filename_list(NOTES_DIR):
                 print("All files has been deleted!")
 
@@ -149,7 +148,7 @@ def edit_note(file_path: str):
 def read_note(file_path: str):
     with open(file_path, "r") as note:
         lines = note.readlines()
-        print(''.join(lines)) 
+        print("".join(lines))
 
 
 def delete_note(file_path: str):
