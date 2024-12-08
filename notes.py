@@ -36,6 +36,7 @@ def main(args: argparse.Namespace):
         file_extension = "txt"
 
         if args.type:
+
             file_extension = args.type
 
         # new file.
@@ -53,14 +54,17 @@ def main(args: argparse.Namespace):
                 ).lower()
 
                 if answer is not None and answer in CONFIRM:
+
                     mode = "w"
 
                 else:
+
                     answer = input(
                         f'Do you want to edit note "{filename}"? "y" | "n" '
                     ).lower()
 
                     if answer is not None and answer in CONFIRM:
+
                         read_note(file_path)
                         edit_note(file_path)
                         print("Note Edited: \n")
@@ -69,6 +73,7 @@ def main(args: argparse.Namespace):
                         return exit_program_clean()
 
                     else:
+
                         return exit_program_clean()
 
             create_note(file_path, mode)
@@ -167,6 +172,7 @@ def main(args: argparse.Namespace):
 def create_note(file_path: str, mode: str = "w") -> None:
 
     with open(file_path, mode) as note:
+
         note.writelines(input("Write your text: \n> "))
         note.write("\n")
 
@@ -174,6 +180,7 @@ def create_note(file_path: str, mode: str = "w") -> None:
 def edit_note(file_path: str) -> None:
 
     with open(file_path, "a") as note:
+
         note.writelines(input("Write your text: \n> "))
         note.write("\n")
 
@@ -181,6 +188,7 @@ def edit_note(file_path: str) -> None:
 def read_note(file_path: str) -> None:
 
     with open(file_path, "r") as note:
+
         print("\n")
         lines = note.readlines()
         print("".join(lines))
@@ -227,36 +235,43 @@ def cli() -> argparse.Namespace:
         action="store",
         help="take in input the filename, Create new file, if the file exists it asks if you want to replace it or open the existing one",
     )
+
     parser.add_argument(
         "-r",
         "--read",
         action="store",
         help="take in input the filename, read it if exists it",
     )
+
     parser.add_argument(
         "-e",
         "--edit",
         action="store",
         help="take in input the filename, if it exists open it in edit mode, if not asks if you want to create a new one",
     )
+
     parser.add_argument(
         "-rn",
         "--rename",
         action="store",
         help="take in input the filename, if it exists open it in edit mode, if not asks if you want to create a new one",
     )
+
     parser.add_argument(
         "-d", "--delete", action="store", help="given a filename, deletes it."
-    ),
+    )
+
     parser.add_argument(
         "-da", "--delete_all", action="store_true", help="deletes all the notes."
-    ),
+    )
+
     parser.add_argument(
         "-l",
         "--list",
         action="store_true",
         help="gives the list of all the notes in the folder.",
     )
+
     parser.add_argument(
         "-t",
         "--type",
